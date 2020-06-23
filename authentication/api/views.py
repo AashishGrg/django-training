@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
-from .serializers import SignupSerializer, LoginSerializer
-from rest_framework.permissions import AllowAny
+from .serializers import SignupSerializer, LoginSerializer, PasswordChangeSerializer
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.conf import settings
-from rest_framework import serializers, exceptions
+from rest_framework import serializers, exceptions, status
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from rest_framework.response import Response
@@ -79,3 +79,22 @@ class LoginAPIView(APIView):
                 return Response(token)
             else:
                 return Response({'detail': 'Active User not Found.'})
+
+
+class PasswordChangeAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PasswordChangeSerializer
+
+    def get_object(self):
+        obj = self.request.user
+        return obj
+
+    def post(self, request):
+        self.object = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            if not self.object.check_password(serializer.data.get("old_password")):
+                raise APIException("you entered wrong password")
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            return Response({"success": "Password changed successfully."}, status=status.HTTP_200_OK)
