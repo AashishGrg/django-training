@@ -1,6 +1,8 @@
 from django.conf import settings
 from rest_framework import serializers
 from django.core import validators
+from django.contrib.auth import get_user_model
+UserModel = get_user_model()
 
 
 class SignupSerializer(serializers.Serializer):
@@ -40,3 +42,10 @@ class PasswordChangeSerializer(serializers.Serializer):
     def validate_new_password(self, value):
         self.validate_password(value)
         return value
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone', 'address', 'image', 'user_type']
+        read_only_fields = ['email', 'user_type']

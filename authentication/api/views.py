@@ -1,5 +1,6 @@
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
-from .serializers import SignupSerializer, LoginSerializer, PasswordChangeSerializer
+from .serializers import SignupSerializer, LoginSerializer, PasswordChangeSerializer, ProfileSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.conf import settings
 from rest_framework import serializers, exceptions, status
@@ -98,3 +99,15 @@ class PasswordChangeAPIView(APIView):
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()
             return Response({"success": "Password changed successfully."}, status=status.HTTP_200_OK)
+
+
+# http://www.cdrf.co for documentation
+
+class UserProfileAPIView(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProfileSerializer
+
+    def get(self, request, *args, **kwargs):
+        user_obj = request.user
+        user_data = self.serializer_class(user_obj).data
+        return Response(data=user_data, status=status.HTTP_200_OK)
