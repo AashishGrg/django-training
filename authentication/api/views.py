@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from .serializers import SignupSerializer, LoginSerializer, PasswordChangeSerializer, ProfileSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -111,3 +111,16 @@ class UserProfileAPIView(RetrieveAPIView):
         user_obj = request.user
         user_data = self.serializer_class(user_obj).data
         return Response(data=user_data, status=status.HTTP_200_OK)
+
+
+class UserProfileUpdateAPIView(UpdateAPIView):
+    queryset = PortalUser.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProfileSerializer
+
+    def patch(self, request, *args, **kwargs):
+        user_obj_id = self.kwargs['pk']
+        if request.user.id == user_obj_id:
+            return self.partial_update(request, *args, **kwargs)
+        return Response({'detail': 'you dont have permission to update the profile'},
+                        status=status.HTTP_400_BAD_REQUEST)
