@@ -21,5 +21,6 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/account/', include('authentication.api.urls')),
+    path('api/hospital/', include('hospital.api.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
