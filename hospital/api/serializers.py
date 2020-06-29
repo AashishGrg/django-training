@@ -7,3 +7,9 @@ class HospitalCreateSerializer(serializers.ModelSerializer):
         model = Hospital
         fields = ('id', 'created_by', 'name', 'latitude', 'longitude', 'address', 'description', 'image', 'is_active')
         read_only_fields = ('id', 'created_by', 'is_active',)
+
+
+class HospitalRetrieveUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hospital
+        fields = ('name', 'latitude', 'longitude', 'address', 'description', 'image', 'is_active')
