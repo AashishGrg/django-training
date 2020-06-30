@@ -4,11 +4,16 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import HospitalCreateSerializer, HospitalRetrieveUpdateSerializer
 from hospital.models import Hospital
 from rest_framework.response import Response
+from .filters import HospitalFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class HospitalAPIView(ListCreateAPIView):
     serializer_class = HospitalCreateSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    # filterset_fields = ['is_active']
+    filter_class = HospitalFilter
 
     def get_queryset(self):
         return Hospital.objects.all().order_by('-created_date')
@@ -36,4 +41,4 @@ class HospitalDeleteAPIView(DestroyAPIView):
             hospital.delete()
             return Response({"detail": "Hospital deleted succesfully"})
         except Hospital.DoesNotExist:
-            raise NotFound("Hospital with the provided id does not exists.") #404
+            raise NotFound("Hospital with the provided id does not exists.")  # 404
